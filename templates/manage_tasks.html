@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Manage Tasks</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Assigned To</th>
+            <th>Assigned By</th>
+            <th>Status</th>
+            <th>Due Date</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.assigned_to.username }}</td>
+            <td>{{ task.created_by.username }}</td>
+            <td>{{ task.status }}</td>
+            <td>{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '—' }}</td>
+            <td>{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-warning">Edit</a>
+                <a href="#" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

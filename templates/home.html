@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 position-relative">
+
+    <!-- 🔔 Notifications (if any) -->
+    {% if notifications %}
+    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        {% for note in notifications %}
+        <div class="alert alert-info alert-dismissible fade show shadow-sm border-0 rounded-3 mb-2" role="alert">
+            <strong>🔔 {{ note.message }}</strong><br>
+            <small class="text-muted">{{ note.created_at.strftime("%Y-%m-%d %H:%M") }}</small>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                    onclick="markAsRead({{ note.id }})"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 🏢 Wallpaper Section -->
+    <div class="wallpaper-section rounded shadow-lg p-5 text-center text-white">
+        <h1 class="mb-5 fw-bold">Tolling Operations Department</h1>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg me-3 shadow-sm">Task Dashboard</a>
+        <a href="{{ url_for('main.reports') }}" class="btn btn-success btn-lg shadow-sm">Reports</a>
+    </div>
+</div>
+
+<!-- 🔧 Scripts -->
+<script>
+function markAsRead(id) {
+    fetch(`/mark_notification_read/${id}`, { method: 'POST' })
+}
+
+// Optional: Auto-refresh notifications every 30 seconds (uncomment to activate)
+/*
+setInterval(() => {
+    fetch(window.location.href)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            const newNotifications = newDoc.querySelector('#notification-container');
+            if (newNotifications) {
+                document.querySelector('#notification-container')?.replaceWith(newNotifications);
+            }
+        });
+}, 30000);
+*/
+</script>
+
+<style>
+/* 🔔 Notifications slide animation */
+#notification-container {
+    animation: slideIn 0.6s ease-out;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🌄 Wallpaper Styling */
+.wallpaper-section {
+    background-image: url('{{ url_for("static", filename="wallpaper.jpg") }}');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: rgba(0,0,0,0.6); /* dark overlay for text readability */
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+
+.wallpaper-section h1 {
+    font-size: 3rem;
+    color: #ffffff; /* corporate white for contrast */
+}
+
+.wallpaper-section .btn {
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wallpaper-section .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+    .wallpaper-section {
+        padding: 3rem 1rem;
+    }
+
+    .wallpaper-section h1 {
+        font-size: 2rem;
+    }
+
+    .wallpaper-section .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+{% endblock %}

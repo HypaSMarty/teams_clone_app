@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Edit Task</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Task Title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Task Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required>
+                        </div>
+
+                        <!-- Task Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ task.description or '' }}</textarea>
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="mb-3">
+                            <label for="assigned_to" class="form-label">Assigned To <span class="text-danger">*</span></label>
+                            <select class="form-select" id="assigned_to" name="assigned_to" required>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {% if user.id == task.assigned_to_id %}selected{% endif %}>
+                                    {{ user.username }} ({{ user.role }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" 
+                                   value="{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '' }}">
+                        </div>
+
+                        <!-- Existing Files -->
+                        <div class="mb-3">
+                            <label class="form-label">Existing Files</label>
+                            <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                {% if files %}
+                                    {% for file in files %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="file_ids" 
+                                               value="{{ file.id }}" id="file_{{ file.id }}"
+                                               {% if file in task.files %}checked{% endif %}>
+                                        <label class="form-check-label" for="file_{{ file.id }}">
+                                            {{ file.original_filename }}
+                                            <small class="text-muted">({{ file.file_type }})</small>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No files available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- New File Uploads -->
+                        <div class="mb-3">
+                            <label for="new_files" class="form-label">Upload New Files</label>
+                            <input type="file" class="form-control" id="new_files" name="new_files" multiple>
+                            <small class="form-text text-muted">You can select multiple files to upload</small>
+                        </div>
+
+                        <!-- Currently Attached Files -->
+                        <div class="mb-3">
+                            <label class="form-label">Currently Attached Files</label>
+                            <div class="border rounded p-3 bg-light">
+                                {% if task.files %}
+                                    {% for file in task.files %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>
+                                            <i class="bi bi-file-earmark"></i> {{ file.original_filename }}
+                                            <small class="text-muted">({{ file.file_type }})</small>
+                                        </span>
+                                        <a href="{{ url_for('main.view_file', file_id=file.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">Download</a>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">No files attached</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('tasks.view_task', task_id=task.id) }}" class="btn btn-secondary">Cancel</a>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Update Task</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-check-input:checked + .form-check-label {
+    font-weight: 500;
+}
+</style>
+{% endblock %}

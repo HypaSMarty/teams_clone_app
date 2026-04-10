@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Manage Users</h2>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th style="width: 250px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.id != current_user.id %}
+                    <form action="{{ url_for('admin.update_role', user_id=user.id) }}" method="POST" class="d-flex">
+                        <select name="role" class="form-select form-select-sm me-2" required>
+                            {% for role_option in roles %}
+                                <option value="{{ role_option }}" {% if user.role == role_option %}selected{% endif %}>
+                                    {{ role_option }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ user.role }} (You)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.id != current_user.id %}
+                    <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="btn btn-sm btn-danger mb-1"
+                       onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">
+                        Delete
+                    </a>
+                    <a href="{{ url_for('admin.reset_user_password', user_id=user.id) }}" class="btn btn-sm btn-warning mb-1">
+                        Reset Password
+                    </a>
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

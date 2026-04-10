@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="reports-wrapper">
+    <div class="container mt-4">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary fw-bold">Department Reports</h2>
+            <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary">← Back to Home</a>
+        </div>
+
+        <form method="get" action="{{ url_for('main.reports') }}" class="row g-3 mb-4 align-items-end">
+           <div class="col-md-3">
+               <label for="start_date" class="form-label">Start Date</label>
+               <input type="date" id="start_date" name="start_date" value="{{ start_date or '' }}" class="form-control">
+           </div>
+           <div class="col-md-3">
+               <label for="end_date" class="form-label">End Date</label>
+               <input type="date" id="end_date" name="end_date" value="{{ end_date or '' }}" class="form-control">
+           </div>
+           <div class="col-md-3">
+               <button type="submit" class="btn btn-primary w-100">Filter</button>
+           </div>
+           <div class="col-md-3">
+               <a href="{{ url_for('main.reports') }}" class="btn btn-outline-secondary w-100">Reset</a>
+           </div>
+       </form>
+
+      <!-- Add Export Buttons here -->
+      <div class="row mb-4">
+          <div class="col-md-3">
+              <a href="{{ url_for('main.export_report', format='pdf', start_date=start_date, end_date=end_date) }}" class="btn btn-danger w-100">
+                  📄 Export as PDF
+              </a>
+          </div>
+          <div class="col-md-3">
+              <a href="{{ url_for('main.export_report', format='excel', start_date=start_date, end_date=end_date) }}" class="btn btn-success w-100">
+                  📊 Export as Excel
+              </a>
+          </div>
+      </div>
+
+
+        <!-- Summary Cards -->
+        <div class="row text-center mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">Completed</h5>
+                        <p class="display-6 fw-bold">{{ completed_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-info">
+                    <div class="card-body">
+                        <h5 class="card-title text-info">Ongoing</h5>
+                        <p class="display-6 fw-bold">{{ ongoing_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">Pending</h5>
+                        <p class="display-6 fw-bold">{{ pending_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-dark">
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">Total</h5>
+                        <p class="display-6 fw-bold">{{ total_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <!-- Monthly Chart -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">📅 Monthly Task Summary</h5>
+                        <canvas id="monthlyChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cumulative Chart -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">📈 Cumulative Task Trend</h5>
+                        <canvas id="cumulativeChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="row mt-3">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">🗂️ Task Categories Breakdown</h5>
+                        <canvas id="categoryChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Table -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">📋 Category Details</h5>
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in category_data %}
+                                <tr>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ item.count }}</td>
+                                    <td>{{ '%.1f' | format(item.percentage) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.reports-wrapper {
+    position: relative;
+    min-height: 90vh;
+    padding-bottom: 40px;
+}
+.reports-wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('{{ url_for("static", filename="wallpaper.jpg") }}');
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px);
+    opacity: 0.15;
+    z-index: -1;
+}
+
+.card {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.9);
+}
+</style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const monthlyData = {{ monthly_data|tojson }};
+const cumulativeData = {{ cumulative_data|tojson }};
+const categoryData = {{ category_data|tojson }};
+
+// Monthly Tasks Chart
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+        labels: monthlyData.labels,
+        datasets: [
+            { label: 'Completed', data: monthlyData.completed, backgroundColor: 'rgba(40, 167, 69, 0.7)' },
+            { label: 'Ongoing', data: monthlyData.ongoing, backgroundColor: 'rgba(23, 162, 184, 0.7)' },
+            { label: 'Pending', data: monthlyData.pending, backgroundColor: 'rgba(255, 193, 7, 0.7)' }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Cumulative Chart
+new Chart(document.getElementById('cumulativeChart'), {
+    type: 'line',
+    data: {
+        labels: cumulativeData.labels,
+        datasets: [{
+            label: 'Cumulative Tasks',
+            data: cumulativeData.values,
+            borderColor: 'rgba(66,103,178,1)',
+            backgroundColor: 'rgba(66,103,178,0.1)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Category Breakdown Pie Chart
+if (categoryData.length > 0) {
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categoryData.map(c => c.category),
+            datasets: [{
+                data: categoryData.map(c => c.count),
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(23, 162, 184, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(220, 53, 69, 0.7)',
+                    'rgba(108, 117, 125, 0.7)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+</script>
+{% endblock %}

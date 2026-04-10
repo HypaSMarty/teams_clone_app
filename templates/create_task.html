@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="create-task-wrapper">
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header text-white bg-primary text-center">
+                    <h4 class="mb-0">Create New Task</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('main.create_task') }}" enctype="multipart/form-data">
+
+                        <!-- Task Category -->
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Category:</label>
+                            <select name="category_id" id="category_id" class="form-select" required>
+                                <option value="">-- Select Category --</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if current_user.is_admin() %}
+                            <small>
+                                <a href="{{ url_for('main.manage_categories') }}">Manage categories</a>
+                            </small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Task Title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title:</label>
+                            <input type="text" name="title" id="title" class="form-control" placeholder="Enter task title" required>
+                        </div>
+
+                        <!-- Task Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description:</label>
+                            <textarea name="description" id="description" class="form-control" rows="3" placeholder="Enter task description (optional)"></textarea>
+                        </div>
+
+                        <!-- Assign Task -->
+                        <div class="mb-3">
+                            <label for="assigned_to" class="form-label">Assign to:</label>
+                            <select name="assigned_to" id="assigned_to" class="form-select" required>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.role }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label">Due Date:</label>
+                            <input type="date" name="due_date" id="due_date" class="form-control">
+                        </div>
+
+                        <!-- Link Existing Files -->
+                        <div class="mb-3">
+                            <label for="file_ids" class="form-label">Link Existing Files (optional):</label>
+                            <select name="file_ids" id="file_ids" class="form-select" multiple>
+                                {% for file in files %}
+                                    <option value="{{ file.id }}">{{ file.original_filename }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple files.</small>
+                        </div>
+
+                        <!-- Upload New Files -->
+                        <div class="mb-3">
+                            <label for="new_files" class="form-label">Upload New Files (optional):</label>
+                            <input type="file" name="new_files" id="new_files" class="form-control" multiple>
+                            <small class="text-muted">You can select multiple files to upload.</small>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-success w-50 me-2">Create Task</button>
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary w-50 ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Optional wallpaper background */
+.create-task-wrapper {
+    position: relative;
+    min-height: 80vh;
+    padding-bottom: 40px;
+}
+
+.create-task-wrapper::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('{{ url_for("static", filename="wallpaper.jpg") }}');
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px);
+    opacity: 0.4;
+    z-index: -1;
+}
+
+/* Card styling */
+.card {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between button,
+    .d-flex.justify-content-between a {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row g-4">
+
+        <!-- Manage Users Card -->
+        <div class="col-md-4">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Users</h5>
+                    <p class="card-text">Promote, demote, delete users, and reset passwords.</p>
+                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-primary">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- View All Tasks Card -->
+        <div class="col-md-4">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">View All Tasks</h5>
+                    <p class="card-text">Monitor and manage tasks across all users and departments.</p>
+                    <a href="{{ url_for('admin.manage_tasks') }}" class="btn btn-info text-white">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Team Dashboard Card -->
+        <div class="col-md-4">
+            <div class="card text-center h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Team Dashboard</h5>
+                    <p class="card-text">Return to the general team dashboard.</p>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Go</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

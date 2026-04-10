@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card mt-5">
+    <div class="card-header">
+        <h4>{{ file.original_filename }}</h4>
+    </div>
+    <div class="card-body">
+        <p>Uploaded by {{ file.uploader.username }} on {{ file.upload_date.strftime('%Y-%m-%d %H:%M') }}</p>
+
+        <!-- Download Button -->
+        <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="btn btn-success mb-3">
+            Download File
+        </a>
+
+        <hr>
+
+        <!-- Linked Task Info -->
+        {% if file.tasks %}
+            <h5>Linked Tasks:</h5>
+            <ul>
+                {% for task in file.tasks %}
+                    <li>
+                        <a href="{{ url_for('main.view_tasks') }}">
+                            {{ task.title }} (Assigned to: {{ task.assigned_to.username }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <h5>Comments</h5>
+        {% if comments %}
+            {% for comment in comments %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <strong>{{ comment.user.username }}</strong>:
+                    <p>{{ comment.content }}</p>
+                    {% if comment.user_id == current_user.id or current_user.role == 'admin' %}
+                    <a href="{{ url_for('comments.delete_comment', comment_id=comment.id) }}" class="btn btn-sm btn-danger">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('comments.add_comment', file_id=file.id) }}">
+            <div class="input-group mt-3">
+                <input type="text" name="comment" class="form-control" placeholder="Add a comment..." required>
+                <button type="submit" class="btn btn-outline-secondary">Comment</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

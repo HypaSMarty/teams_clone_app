@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Task Categories</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Add New Category -->
+                    <form method="POST" class="mb-4">
+                        <input type="hidden" name="action" value="add">
+                        <div class="input-group">
+                            <input type="text" name="name" class="form-control" placeholder="New category name" required>
+                            <button type="submit" class="btn btn-success">Add Category</button>
+                        </div>
+                    </form>
+
+                    <!-- Existing Categories -->
+                    <h5 class="mt-3">Existing Categories</h5>
+                    <ul class="list-group">
+                        {% for category in categories %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ category.name }}
+                            <form method="POST" style="margin:0;">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="category_id" value="{{ category.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item text-muted">No categories found.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('main.create_task') }}" class="btn btn-secondary">Back to Create Task</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+</style>
+{% endblock %}

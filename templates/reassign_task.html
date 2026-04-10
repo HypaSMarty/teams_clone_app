@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Reassign Task: {{ task.title }}</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="assigned_to">Assign To:</label>
+        <select name="assigned_to" class="form-control" required>
+            {% for user in users %}
+            <option value="{{ user.id }}" {% if user.id == task.assigned_to_id %}selected{% endif %}>
+                {{ user.username }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Reassign Task</button>
+</form>
+{% endblock %}

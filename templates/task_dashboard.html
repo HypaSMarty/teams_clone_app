@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="task-dashboard-wrapper position-relative">
+
+    <!-- Optional blurred wallpaper background -->
+    <div class="bg-wallpaper"></div>
+
+    <div class="container mt-4">
+
+        <!-- Header & Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{{ url_for('main.home') }}" class="btn btn-primary">← Home</a>
+            <h2 class="mb-0 text-primary">Task Dashboard</h2>
+            <a href="{{ url_for('main.create_task') }}" class="btn btn-success">Create Task</a>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="btn-group mb-3" role="group">
+            <a href="{{ url_for('main.view_tasks') }}" 
+               class="btn btn-outline-primary {% if filter == 'all' %}active{% endif %}">All</a>
+            <a href="{{ url_for('main.view_tasks', status='Pending') }}" 
+               class="btn btn-outline-warning {% if filter == 'Pending' %}active{% endif %}">Pending</a>
+            <a href="{{ url_for('main.view_tasks', status='Ongoing') }}" 
+               class="btn btn-outline-info {% if filter == 'Ongoing' %}active{% endif %}">Ongoing</a>
+            <a href="{{ url_for('main.view_tasks', status='Completed') }}" 
+               class="btn btn-outline-success {% if filter == 'Completed' %}active{% endif %}">Completed</a>
+        </div>
+
+        <!-- Task Table -->
+        <div class="table-responsive shadow-sm rounded bg-white p-3">
+            <table class="table table-bordered table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Assigned By</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th>Linked Files</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.title }}</td>
+                        <td>{{ task.category.name if task.category else 'Uncategorized' }}</td>
+                        <td>{{ task.description or '—' }}</td>
+                        <td>{{ task.creator.username if task.creator else '—' }}</td>
+                        <td>{{ task.assigned_to.username if task.assigned_to else '—' }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if task.status == 'Pending' %}bg-warning
+                                {% elif task.status == 'Ongoing' %}bg-info
+                                {% elif task.status == 'Completed' %}bg-success
+                                {% else %}bg-secondary{% endif %}">
+                                {{ task.status }}
+                            </span>
+                        </td>
+                        <td>{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '—' }}</td>
+                        <td>
+                            {% if task.files %}
+                                {% for file in task.files %}
+                                    <a href="{{ url_for('main.view_file', file_id=file.id) }}" 
+                                       class="badge bg-secondary text-decoration-none me-1"
+                                       data-bs-toggle="tooltip"
+                                       title="Uploader: {{ file.uploader.username if file.uploader else 'Unknown' }}">
+                                        {{ file.original_filename[:15] }}{% if file.original_filename|length > 15 %}...{% endif %}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ task.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+
+                        <!-- Actions -->
+                        <td>
+                            <div class="d-flex flex-column">
+                                {% if current_user.id == task.creator.id %}
+                                    {% if task.status != 'Completed' %}
+                                    <form action="{{ url_for('main.mark_task_complete', task_id=task.id) }}" method="post" class="d-inline mb-1">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark Complete</button>
+                                    </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('main.reassign_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary mb-1">Reassign</a>
+                                    <form action="{{ url_for('main.delete_task', task_id=task.id) }}" method="post" class="d-inline mb-1" onsubmit="return confirm('Are you sure you want to delete this task?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                {% elif current_user.id == task.assigned_to_id %}
+                                    {% if task.status == 'Pending' %}
+                                    <form action="{{ url_for('main.accept_task', task_id=task.id) }}" method="post" class="d-inline mb-1">
+                                        <button type="submit" class="btn btn-sm btn-outline-info">Accept</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+
+                                <!-- Comments Button with Count Badge -->
+                                <a href="{{ url_for('main.task_comments', task_id=task.id) }}" class="btn btn-sm btn-outline-info mt-1">
+                                    Comments <span class="badge bg-secondary">{{ task.comments|length }}</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">No tasks available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.task-dashboard-wrapper {
+    position: relative;
+    min-height: 90vh;
+    padding-bottom: 40px;
+}
+.bg-wallpaper {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('{{ url_for("static", filename="wallpaper.jpg") }}');
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px);
+    opacity: 0.15;
+    z-index: -1;
+}
+
+/* Optional: make table container slightly transparent for a modern corporate feel */
+.table-responsive {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 15px;
+}
+</style>
+{% endblock %}

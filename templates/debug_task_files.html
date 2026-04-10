@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Debug Task Files</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Task Information</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>ID:</strong> {{ task.id }}</p>
+            <p><strong>Title:</strong> {{ task.title }}</p>
+            <p><strong>Description:</strong> {{ task.description or 'None' }}</p>
+            <p><strong>Status:</strong> {{ task.status }}</p>
+            <p><strong>Assigned To:</strong> {{ task.assigned_to.username if task.assigned_to else 'None' }}</p>
+            <p><strong>Created By:</strong> {{ task.creator.username if task.creator else 'None' }}</p>
+            <p><strong>Files Count:</strong> {{ task.files|length }}</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Files Associated with this Task</h3>
+        </div>
+        <div class="card-body">
+            {% if task.files %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Filename</th>
+                            <th>Original Filename</th>
+                            <th>File Type</th>
+                            <th>Uploader</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in task.files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.filename }}</td>
+                            <td>{{ file.original_filename }}</td>
+                            <td>{{ file.file_type }}</td>
+                            <td>{{ file.uploader.username if file.uploader else 'Unknown' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No files associated with this task.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Association Table Entries</h3>
+        </div>
+        <div class="card-body">
+            {% if association_entries %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>File ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in association_entries %}
+                        <tr>
+                            <td>{{ entry.task_id }}</td>
+                            <td>{{ entry.file_id }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No association table entries found for this task.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>All Files in System</h3>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Filename</th>
+                        <th>Original Filename</th>
+                        <th>File Type</th>
+                        <th>Uploader</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in all_files %}
+                    <tr>
+                        <td>{{ file.id }}</td>
+                        <td>{{ file.filename }}</td>
+                        <td>{{ file.original_filename }}</td>
+                        <td>{{ file.file_type }}</td>
+                        <td>{{ file.uploader.username if file.uploader else 'Unknown' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{{ url_for('main.view_tasks') }}" class="btn btn-primary">Back to Task Dashboard</a>
+    </div>
+</div>
+{% endblock %}

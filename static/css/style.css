@@ -1,0 +1,61 @@
+/* General corporate theme */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+.navbar {
+    background-color: #0a3d62 !important; /* deep blue */
+}
+
+.navbar .nav-link, .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+    color: #00a8ff !important;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.card, .table, .alert {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: #0a3d62;
+    border-color: #0a3d62;
+}
+
+.btn-primary:hover {
+    background-color: #00a8ff;
+    border-color: #00a8ff;
+}
+
+.btn-secondary {
+    background-color: #4a69bd;
+    border-color: #4a69bd;
+}
+
+.btn-secondary:hover {
+    background-color: #60a3bc;
+    border-color: #60a3bc;
+}
+
+.table th {
+    background-color: #0a3d62;
+    color: #fff;
+}
+
+.footer {
+    margin-top: 40px;
+    padding: 10px 0;
+    background-color: #0a3d62;
+    color: white;
+    text-align: center;
+}
