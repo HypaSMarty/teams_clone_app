@@ -29,7 +29,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(50), default='Staff', nullable=False)
+    role = db.Column(db.String(50), default='Administrative Assistant', nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -53,24 +53,24 @@ class User(UserMixin, db.Model):
     def is_manager(self): return self.role == "Department Manager"
     def is_officer(self): return self.role == "Department Officer"
     def is_supervisor(self): return self.role == "Department Supervisor"
-    def is_staff(self): return self.role == "Staff"
+    def is_staff(self): return self.role == "Administrative Assistant"
 
     def can_assign_task_to(self, other_user):
         """
         Task assignment permissions:
 
         - Admin → anyone
-        - Department Manager → Officers, Supervisors, Staff
-        - Department Officer → Supervisors, Staff
-        - Department Supervisor → Staff
-        - Staff → cannot assign
+        - Department Manager → Officers, Supervisors, Administrative Assistant
+        - Department Officer → Supervisors, Administrative Assistant
+        - Department Supervisor → Administrative Assistant
+        - Administrative Assistant → cannot assign
         """
         if self.is_admin():
             return True
         elif self.is_manager():
-            return other_user.role in ["Department Officer", "Department Supervisor", "Staff"]
+            return other_user.role in ["Department Officer", "Department Supervisor", "Administrative Assistant"]
         elif self.is_officer():
-            return other_user.role in ["Department Supervisor", "Staff"]
+            return other_user.role in ["Department Supervisor", "Administrative Assistant"]
         elif self.is_supervisor():
             return other_user.is_staff()
         return False

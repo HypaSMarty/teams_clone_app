@@ -1,6 +1,6 @@
 @echo off
 REM Change directory to your project folder
-cd /d C:\Users\Tshumba\teams_clone_app
+cd /d C:\Users\Tshumba\Documents\Work Documents\Work Apps\teams_clone_app Oct-14 fully enhanced
 
 REM Activate the virtual environment
 call venv\Scripts\activate.bat

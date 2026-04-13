@@ -31,7 +31,7 @@ def manage_users():
         return redirect(url_for("main.home"))
 
     users = User.query.order_by(User.username).all()
-    roles = ["Admin", "Department Manager", "Department Officer", "Department Supervisor", "Staff"]
+    roles = ["Admin", "Department Manager", "Department Officer", "Department Supervisor", "Administrative Assistant"]
     return render_template("manage_users.html", users=users, roles=roles)
 
 
@@ -47,7 +47,7 @@ def update_role(user_id):
 
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
-    valid_roles = ["Admin", "Department Manager", "Department Officer", "Department Supervisor", "Staff"]
+    valid_roles = ["Admin", "Department Manager", "Department Officer", "Department Supervisor", "Administrative Assistant"]
 
     if new_role not in valid_roles:
         flash("❌ Invalid role selected.", "danger")
